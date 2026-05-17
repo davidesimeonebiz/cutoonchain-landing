@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export type StickyItem = {
@@ -34,13 +34,18 @@ export function StickyScrollReveal({
     offset: ["start start", "end end"],
   });
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const idx = Math.min(
-      items.length - 1,
-      Math.max(0, Math.floor(latest * items.length))
-    );
-    setActive(idx);
-  });
+  useEffect(() => {
+    const updateActive = (latest: number) => {
+      const idx = Math.min(
+        items.length - 1,
+        Math.max(0, Math.floor(latest * items.length))
+      );
+      setActive(idx);
+    };
+
+    updateActive(scrollYProgress.get());
+    return scrollYProgress.on("change", updateActive);
+  }, [scrollYProgress, items.length]);
 
   return (
     <>
