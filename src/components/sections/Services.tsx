@@ -89,6 +89,8 @@ function ServiceVisual({
         fill
         sizes="(max-width: 1024px) 100vw, 40vw"
         className="object-cover object-center"
+        quality={55}
+        loading={service.slug === "matched-betting" ? "eager" : "lazy"}
         priority={service.slug === "matched-betting"}
       />
       <div

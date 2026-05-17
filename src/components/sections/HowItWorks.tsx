@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 import { howItWorksSteps } from "@/config/navigation";
+import { useLiteMotion } from "@/lib/motion-prefs";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -13,11 +14,19 @@ if (typeof window !== "undefined") {
 
 export function HowItWorks() {
   const root = useRef<HTMLDivElement>(null);
+  const liteMotion = useLiteMotion();
 
   useGSAP(
     () => {
       const items = gsap.utils.toArray<HTMLElement>(".how-step");
       if (!items.length) return;
+
+      if (liteMotion) {
+        gsap.set(items, { opacity: 1, y: 0, scale: 1 });
+        const line = root.current?.querySelector<HTMLElement>(".how-line");
+        if (line) gsap.set(line, { scaleY: 1 });
+        return;
+      }
 
       items.forEach((el) => {
         gsap.fromTo(
@@ -56,7 +65,7 @@ export function HowItWorks() {
         );
       }
     },
-    { scope: root }
+    { scope: root, dependencies: [liteMotion] }
   );
 
   return (

@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useLiteMotion } from "@/lib/motion-prefs";
 
 export function AnimatedSection({
   id,
@@ -14,6 +15,16 @@ export function AnimatedSection({
   children: React.ReactNode;
   delay?: number;
 }) {
+  const liteMotion = useLiteMotion();
+
+  if (liteMotion) {
+    return (
+      <section id={id} className={cn("scroll-mt-24", className)}>
+        {children}
+      </section>
+    );
+  }
+
   return (
     <motion.section
       id={id}

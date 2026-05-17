@@ -10,17 +10,22 @@ import { AuroraBackground } from "@/components/animations/AuroraBackground";
 import { Spotlight } from "@/components/animations/Spotlight";
 import { stats } from "@/config/stats";
 import { NumberTicker } from "@/components/animations/NumberTicker";
+import { useLiteMotion } from "@/lib/motion-prefs";
 
 export function Hero() {
+  const liteMotion = useLiteMotion();
+
   return (
     <AuroraBackground className="relative flex min-h-[100svh] items-center justify-center pt-20">
-      <Spotlight className="-top-40 left-0 md:-top-20 md:left-60" fill="var(--bull)" />
+      {!liteMotion && (
+        <Spotlight className="-top-40 left-0 md:-top-20 md:left-60" fill="var(--bull)" />
+      )}
       <div className="bg-grid bg-grid-fade absolute inset-0 -z-10 opacity-30" aria-hidden />
 
       <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={liteMotion ? false : { opacity: 0, y: 12 }}
+          animate={liteMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
         >
@@ -29,8 +34,8 @@ export function Hero() {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={liteMotion ? false : { opacity: 0, y: 16 }}
+          animate={liteMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mt-6 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl"
         >

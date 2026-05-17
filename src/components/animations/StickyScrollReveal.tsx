@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll } from "motion/react";
+import { useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useLiteMotion } from "@/lib/motion-prefs";
 
 export type StickyItem = {
   title: string;
@@ -10,16 +11,8 @@ export type StickyItem = {
   content: React.ReactNode;
 };
 
-/**
- * Sticky Scroll Reveal in stile Aceternity, riscritto per essere robusto con N servizi:
- *
- * - Desktop (lg+): un solo item visibile alla volta, posizionato in assoluto cosi'
- *   non puo' MAI overfloware il contenitore sticky e sovrapporsi alle sezioni vicine.
- *   Ogni servizio occupa una "fetta" di scroll pari a (containerHeight / items.length).
- *
- * - Mobile/tablet: layout dedicato, lista verticale di card senza sticky.
- *   Niente 450vh di scroll inutile.
- */
+const SCROLL_VH_PER_ITEM = 55;
+
 export function StickyScrollReveal({
   items,
   className,
@@ -29,6 +22,8 @@ export function StickyScrollReveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const liteMotion = useLiteMotion();
+  const rafRef = useRef<number | null>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -40,16 +35,29 @@ export function StickyScrollReveal({
         items.length - 1,
         Math.max(0, Math.floor(latest * items.length))
       );
-      setActive(idx);
+      setActive((prev) => (prev === idx ? prev : idx));
+    };
+
+    const onChange = (latest: number) => {
+      if (liteMotion) {
+        updateActive(latest);
+        return;
+      }
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        updateActive(latest);
+        rafRef.current = null;
+      });
     };
 
     updateActive(scrollYProgress.get());
-    return scrollYProgress.on("change", updateActive);
-  }, [scrollYProgress, items.length]);
+    return scrollYProgress.on("change", onChange);
+  }, [scrollYProgress, items.length, liteMotion]);
+
+  const activeItem = items[active];
 
   return (
     <>
-      {/* ---------------- Mobile / tablet ---------------- */}
       <div className="space-y-6 px-4 sm:px-6 lg:hidden">
         {items.map((item, i) => (
           <article
@@ -74,43 +82,25 @@ export function StickyScrollReveal({
         ))}
       </div>
 
-      {/* ---------------- Desktop sticky reveal ---------------- */}
       <div
         ref={ref}
         className={cn("relative hidden w-full lg:block", className)}
-        style={{ height: `${items.length * 85}vh` }}
+        style={{ height: `${items.length * SCROLL_VH_PER_ITEM}vh` }}
       >
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-8 px-4 sm:px-6 lg:px-8">
-            {/* LEFT: text column, items stacked absolutely so no overflow */}
-            <div className="relative h-[68vh]">
-              {items.map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={false}
-                  animate={{
-                    opacity: active === i ? 1 : 0,
-                    y: active === i ? 0 : 24,
-                  }}
-                  transition={{ duration: 0.45, ease: "easeOut" }}
-                  className="absolute inset-0 flex flex-col justify-center space-y-4 pointer-events-none data-[active=true]:pointer-events-auto"
-                  data-active={active === i}
-                  aria-hidden={active !== i}
-                >
-                  <span className="text-xs uppercase tracking-[0.2em] text-primary">
-                    Servizio {i + 1} di {items.length}
-                  </span>
-                  <h3 className="font-heading text-4xl font-semibold text-foreground xl:text-5xl">
-                    {item.title}
-                  </h3>
-                  <div className="max-w-md text-base text-muted-foreground">
-                    {item.description}
-                  </div>
-                </motion.div>
-              ))}
+            <div className="relative flex h-[68vh] flex-col justify-center space-y-4">
+              <span className="text-xs uppercase tracking-[0.2em] text-primary">
+                Servizio {active + 1} di {items.length}
+              </span>
+              <h3 className="font-heading text-4xl font-semibold text-foreground xl:text-5xl">
+                {activeItem.title}
+              </h3>
+              <div className="max-w-md text-base text-muted-foreground">
+                {activeItem.description}
+              </div>
             </div>
 
-            {/* CENTER: progress rail */}
             <div className="flex flex-col gap-2" aria-hidden>
               {items.map((_, i) => (
                 <span
@@ -123,23 +113,10 @@ export function StickyScrollReveal({
               ))}
             </div>
 
-            {/* RIGHT: visual column */}
             <div className="relative h-[68vh] overflow-hidden rounded-3xl border border-border bg-card/40 shadow-2xl">
-              {items.map((item, i) => (
-                <motion.div
-                  key={item.title}
-                  initial={false}
-                  animate={{
-                    opacity: active === i ? 1 : 0,
-                    scale: active === i ? 1 : 0.96,
-                  }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="absolute inset-0"
-                  aria-hidden={active !== i}
-                >
-                  {item.content}
-                </motion.div>
-              ))}
+              <div key={activeItem.title} className="absolute inset-0">
+                {activeItem.content}
+              </div>
             </div>
           </div>
         </div>

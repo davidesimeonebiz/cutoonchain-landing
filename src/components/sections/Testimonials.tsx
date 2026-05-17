@@ -5,8 +5,10 @@ import { Star } from "lucide-react";
 import { InfiniteMovingCards } from "@/components/animations/InfiniteMovingCards";
 import { AnimatedSection } from "@/components/animations/AnimatedSection";
 import { testimonials } from "@/config/testimonials";
+import { useLiteMotion } from "@/lib/motion-prefs";
 
 export function Testimonials() {
+  const liteMotion = useLiteMotion();
   const cards = testimonials.map((t) => ({
     id: t.name,
     node: (
@@ -44,14 +46,16 @@ export function Testimonials() {
           Cosa dicono i nostri trader.
         </h2>
       </div>
-      <InfiniteMovingCards items={cards} speed={60} />
-      <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6 lg:px-8">
-        <InfiniteMovingCards
-          items={[...cards].reverse()}
-          speed={70}
-          direction="right"
-        />
-      </div>
+      <InfiniteMovingCards items={cards} speed={liteMotion ? 90 : 60} />
+      {!liteMotion && (
+        <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6 lg:px-8">
+          <InfiniteMovingCards
+            items={[...cards].reverse()}
+            speed={70}
+            direction="right"
+          />
+        </div>
+      )}
     </AnimatedSection>
   );
 }

@@ -190,3 +190,13 @@
       0 8px 32px -8px color-mix(in oklch, var(--bull) 40%, transparent);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora,
+  .animate-marquee,
+  .animate-marquee-vertical,
+  .animate-shimmer,
+  .animate-meteor {
+    animation: none !important;
+  }
+}
