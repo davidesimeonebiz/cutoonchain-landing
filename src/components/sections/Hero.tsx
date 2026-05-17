@@ -23,26 +23,41 @@ export function Hero() {
       <div className="bg-grid bg-grid-fade absolute inset-0 -z-10 opacity-30" aria-hidden />
 
       <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6 lg:px-8">
-        <motion.div
-          initial={liteMotion ? false : { opacity: 0, y: 12 }}
-          animate={liteMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
-        >
-          <Sparkles className="size-3 text-primary" />
-          <span>Cuto On Chain — Strutturati e trading trasparente</span>
-        </motion.div>
+        {liteMotion ? (
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+            <Sparkles className="size-3 text-primary" />
+            <span>Cuto On Chain — Strutturati e trading trasparente</span>
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
+          >
+            <Sparkles className="size-3 text-primary" />
+            <span>Cuto On Chain — Strutturati e trading trasparente</span>
+          </motion.div>
+        )}
 
-        <motion.h1
-          initial={liteMotion ? false : { opacity: 0, y: 16 }}
-          animate={liteMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-6 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl"
-        >
-          Niente guru. Solo{" "}
-          <span className="text-gold">metodi</span> e{" "}
-          <span className="text-bull">numeri</span> verificabili.
-        </motion.h1>
+        {liteMotion ? (
+          <h1 className="mt-6 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl">
+            Niente guru. Solo{" "}
+            <span className="text-gold">metodi</span> e{" "}
+            <span className="text-bull">numeri</span> verificabili.
+          </h1>
+        ) : (
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-6 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl"
+          >
+            Niente guru. Solo{" "}
+            <span className="text-gold">metodi</span> e{" "}
+            <span className="text-bull">numeri</span> verificabili.
+          </motion.h1>
+        )}
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}

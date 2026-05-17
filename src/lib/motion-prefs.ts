@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+function readMedia(query: string) {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia(query).matches;
+}
+
 export function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
+  const [reduced, setReduced] = useState(() =>
+    readMedia("(prefers-reduced-motion: reduce)")
+  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -17,7 +24,7 @@ export function usePrefersReducedMotion() {
 }
 
 export function useIsCoarsePointer() {
-  const [coarse, setCoarse] = useState(false);
+  const [coarse, setCoarse] = useState(() => readMedia("(pointer: coarse)"));
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: coarse)");
