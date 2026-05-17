@@ -26,7 +26,7 @@ export function Hero() {
         {liteMotion ? (
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
             <Sparkles className="size-3 text-primary" />
-            <span>Cuto On Chain — Strutturati e trading trasparente</span>
+            <span>Consulenza 1 a 1 gratuita, inclusa in ogni servizio</span>
           </div>
         ) : (
           <motion.div
@@ -36,7 +36,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
           >
             <Sparkles className="size-3 text-primary" />
-            <span>Cuto On Chain — Strutturati e trading trasparente</span>
+            <span>Consulenza 1 a 1 gratuita, inclusa in ogni servizio</span>
           </motion.div>
         )}
 

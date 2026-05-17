@@ -6,7 +6,7 @@ import type { SiteConfig } from "@/types";
  */
 export const siteConfig: SiteConfig = {
   name: "Cuto On Chain",
-  title: "Cuto On Chain — Percorsi strutturati e trading verificabile",
+  title: "Cuto On Chain",
   description:
     "Matched betting e AutoCPA con obiettivi indicativi, senza mercati finanziari. Segnali, copy su oro, Flip e copy conservativo per chi accetta il rischio del trading. Nessuna promessa di rendimento: storici verificabili dove pubblicati.",
   url: "https://www.cutoonchain.example",
