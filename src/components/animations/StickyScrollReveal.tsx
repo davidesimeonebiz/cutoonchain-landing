@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll } from "motion/react";
+import { AnimatePresence, motion, useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
 import { useLiteMotion } from "@/lib/motion-prefs";
 
@@ -11,7 +11,8 @@ export type StickyItem = {
   content: React.ReactNode;
 };
 
-const SCROLL_VH_PER_ITEM = 55;
+const SCROLL_VH_LITE = 55;
+const SCROLL_VH_FULL = 72;
 
 export function StickyScrollReveal({
   items,
@@ -24,6 +25,7 @@ export function StickyScrollReveal({
   const [active, setActive] = useState(0);
   const liteMotion = useLiteMotion();
   const rafRef = useRef<number | null>(null);
+  const scrollVh = liteMotion ? SCROLL_VH_LITE : SCROLL_VH_FULL;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -58,47 +60,112 @@ export function StickyScrollReveal({
 
   return (
     <>
-      <div className="space-y-6 px-4 sm:px-6 lg:hidden">
-        {items.map((item, i) => (
-          <article
-            key={item.title}
-            className="overflow-hidden rounded-2xl border border-border bg-card/50 shadow-lg"
-          >
-            <div className="relative h-64 overflow-hidden border-b border-border bg-card/60 sm:h-72">
-              {item.content}
-            </div>
-            <div className="space-y-3 p-5 sm:p-6">
-              <span className="text-[10px] uppercase tracking-[0.18em] text-primary">
-                Servizio {i + 1} di {items.length}
-              </span>
-              <h3 className="font-heading text-xl font-semibold sm:text-2xl">
-                {item.title}
-              </h3>
-              <div className="text-sm text-muted-foreground">
-                {item.description}
+      {liteMotion ? (
+        <div className="space-y-6 px-4 sm:px-6 lg:hidden">
+          {items.map((item, i) => (
+            <article
+              key={item.title}
+              className="overflow-hidden rounded-2xl border border-border bg-card/50 shadow-lg"
+            >
+              <div className="relative h-64 overflow-hidden border-b border-border bg-card/60 sm:h-72">
+                {item.content}
               </div>
-            </div>
-          </article>
-        ))}
-      </div>
+              <div className="space-y-3 p-5 sm:p-6">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-primary">
+                  Servizio {i + 1} di {items.length}
+                </span>
+                <h3 className="font-heading text-xl font-semibold sm:text-2xl">
+                  {item.title}
+                </h3>
+                <div className="text-sm text-muted-foreground">
+                  {item.description}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          className="space-y-6 px-4 sm:px-6 lg:hidden"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08 } },
+          }}
+        >
+          {items.map((item, i) => (
+            <motion.article
+              key={item.title}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="overflow-hidden rounded-2xl border border-border bg-card/50 shadow-lg"
+            >
+              <div className="relative h-64 overflow-hidden border-b border-border bg-card/60 sm:h-72">
+                {item.content}
+              </div>
+              <div className="space-y-3 p-5 sm:p-6">
+                <span className="text-[10px] uppercase tracking-[0.18em] text-primary">
+                  Servizio {i + 1} di {items.length}
+                </span>
+                <h3 className="font-heading text-xl font-semibold sm:text-2xl">
+                  {item.title}
+                </h3>
+                <div className="text-sm text-muted-foreground">
+                  {item.description}
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </motion.div>
+      )}
 
       <div
         ref={ref}
         className={cn("relative hidden w-full lg:block", className)}
-        style={{ height: `${items.length * SCROLL_VH_PER_ITEM}vh` }}
+        style={{ height: `${items.length * scrollVh}vh` }}
       >
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-8 px-4 sm:px-6 lg:px-8">
-            <div className="relative flex h-[68vh] flex-col justify-center space-y-4">
-              <span className="text-xs uppercase tracking-[0.2em] text-primary">
-                Servizio {active + 1} di {items.length}
-              </span>
-              <h3 className="font-heading text-4xl font-semibold text-foreground xl:text-5xl">
-                {activeItem.title}
-              </h3>
-              <div className="max-w-md text-base text-muted-foreground">
-                {activeItem.description}
-              </div>
+            <div className="relative flex h-[68vh] flex-col justify-center overflow-hidden">
+              {liteMotion ? (
+                <div className="space-y-4">
+                  <span className="text-xs uppercase tracking-[0.2em] text-primary">
+                    Servizio {active + 1} di {items.length}
+                  </span>
+                  <h3 className="font-heading text-4xl font-semibold text-foreground xl:text-5xl">
+                    {activeItem.title}
+                  </h3>
+                  <div className="max-w-md text-base text-muted-foreground">
+                    {activeItem.description}
+                  </div>
+                </div>
+              ) : (
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={activeItem.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="space-y-4"
+                  >
+                    <span className="text-xs uppercase tracking-[0.2em] text-primary">
+                      Servizio {active + 1} di {items.length}
+                    </span>
+                    <h3 className="font-heading text-4xl font-semibold text-foreground xl:text-5xl">
+                      {activeItem.title}
+                    </h3>
+                    <div className="max-w-md text-base text-muted-foreground">
+                      {activeItem.description}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </div>
 
             <div className="flex flex-col gap-2" aria-hidden>
@@ -106,17 +173,32 @@ export function StickyScrollReveal({
                 <span
                   key={i}
                   className={cn(
-                    "h-8 w-1 rounded-full transition-colors duration-300",
-                    active === i ? "bg-primary" : "bg-border"
+                    "h-8 w-1 rounded-full transition-all duration-300",
+                    active === i ? "scale-110 bg-primary" : "bg-border"
                   )}
                 />
               ))}
             </div>
 
             <div className="relative h-[68vh] overflow-hidden rounded-3xl border border-border bg-card/40 shadow-2xl">
-              <div key={activeItem.title} className="absolute inset-0">
-                {activeItem.content}
-              </div>
+              {liteMotion ? (
+                <div key={activeItem.title} className="absolute inset-0">
+                  {activeItem.content}
+                </div>
+              ) : (
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={activeItem.title}
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.45, ease: "easeOut" }}
+                    className="absolute inset-0"
+                  >
+                    {activeItem.content}
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </div>
           </div>
         </div>
